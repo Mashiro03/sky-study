@@ -52,7 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         //密码比对
 
 //对前端密码进行加密处理
-       password= DigestUtils.md5DigestAsHex(password.getBytes());
+        password = DigestUtils.md5DigestAsHex(password.getBytes());
         if (!password.equals(employee.getPassword())) {
             //密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
@@ -78,16 +78,47 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employee.setCreateUser(BaseContext.getCurrentId());
         employee.setUpdateUser(BaseContext.getCurrentId());
-        employeeMapper.insert( employee);
+        employeeMapper.insert(employee);
     }
 
     @Override
-    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO){
-        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
-      Page<Employee> page=  employeeMapper.pageQuery(employeePageQueryDTO);
-      long total = page.getTotal();
+    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
+        long total = page.getTotal();
         List<Employee> records = page.getResult();
-      return new PageResult(total,records);
+        return new PageResult(total, records);
+    }
+
+    /**
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Employee employee = Employee.builder()
+                .id(id)
+                .status(status)
+                .build();
+        employeeMapper.update(employee);
+
+    }
+
+    @Override
+    public Employee getById(Long id) {
+
+         Employee employee = employeeMapper.getById(id);
+         employee.setPassword("****");
+         return employee;
+    }
+
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(employee);
     }
 
 }
