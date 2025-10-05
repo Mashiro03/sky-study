@@ -34,6 +34,6 @@ public class CommonController {
             log.error("文件上传失败: {}",e);
         }
 
-        return null;
+        return Result.error("上传失败");
     }
 }
